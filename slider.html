@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Responsive Swiper Slider</title>
+    <!-- Swiper CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/swiper@12/swiper-bundle.min.css"
+    />
+    <link rel="stylesheet" href="slider.css" />
+  </head>
+  <body>
+    <main class="page">
+      <h1 class="title">Responsive Swiper Slider</h1>
+      <div class="slider-container">
+        <div class="swiper" id="imageSlider">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide">
+              <img
+                src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=1200&q=80"
+                alt="Landscape 1"
+              />
+            </div>
+            <div class="swiper-slide">
+              <img
+                src="https://images.unsplash.com/photo-1496307653780-42ee777d4833?auto=format&fit=crop&w=1200&q=80"
+                alt="Landscape 2"
+              />
+            </div>
+            <div class="swiper-slide">
+              <img
+                src="https://images.unsplash.com/photo-1519999482648-25049ddd37b1?auto=format&fit=crop&w=1200&q=80"
+                alt="Landscape 3"
+              />
+            </div>
+            <div class="swiper-slide">
+              <img
+                src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80"
+                alt="Landscape 4"
+              />
+            </div>
+          </div>
+
+          <!-- Add Pagination -->
+          <div class="swiper-pagination"></div>
+
+          <!-- Add Navigation -->
+          <div class="swiper-button-prev" aria-label="Previous slide"></div>
+          <div class="swiper-button-next" aria-label="Next slide"></div>
+        </div>
+
+        <p class="caption">
+          Swipe or use arrows to navigate. Images are set to
+          <code>object-fit: contain</code>.
+        </p>
+      </div>
+    </main>
+
+    <!-- Swiper JS -->
+    <script src="https://unpkg.com/swiper@12/swiper-bundle.min.js"></script>
+    <script src="slider.js"></script>
+  </body>
+</html>
