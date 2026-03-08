@@ -334,7 +334,7 @@ function VideoSection() {
             muted={muted}
             loop
             playsInline
-            poster={devPhoto}
+           
           />
 
           <div className={`video-overlay ${playing ? "playing" : "paused"}`}>
