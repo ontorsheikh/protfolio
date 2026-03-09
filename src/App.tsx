@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperClass } from "swiper";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 
 import "swiper/css";
@@ -229,11 +230,13 @@ function AboutSection() {
 function VideoSection() {
   const reduceMotion = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const isSeekingRef = useRef(false);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
   const [volume, setVolume] = useState(0.6);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isSeeking, setIsSeeking] = useState(false);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -251,7 +254,11 @@ function VideoSection() {
       video.volume = volume;
     };
 
-    const updateTime = () => setCurrentTime(video.currentTime);
+    const updateTime = () => {
+      if (!isSeekingRef.current) {
+        setCurrentTime(video.currentTime);
+      }
+    };
     const updateDuration = () => setDuration(video.duration);
 
     applyVolume();
@@ -272,6 +279,22 @@ function VideoSection() {
     };
   }, [reduceMotion, muted, volume]);
 
+  useEffect(() => {
+    const stopSeeking = () => {
+      if (!isSeekingRef.current) return;
+      isSeekingRef.current = false;
+      setIsSeeking(false);
+    };
+
+    window.addEventListener("pointerup", stopSeeking);
+    window.addEventListener("touchend", stopSeeking);
+
+    return () => {
+      window.removeEventListener("pointerup", stopSeeking);
+      window.removeEventListener("touchend", stopSeeking);
+    };
+  }, []);
+
   const togglePlay = () => {
     const video = videoRef.current;
     if (!video) return;
@@ -291,6 +314,16 @@ function VideoSection() {
 
   const handleVolumeChange = (value: number) => {
     setVolume(value);
+  };
+
+  const startSeeking = () => {
+    isSeekingRef.current = true;
+    setIsSeeking(true);
+  };
+
+  const stopSeeking = () => {
+    isSeekingRef.current = false;
+    setIsSeeking(false);
   };
 
   const seek = (time: number) => {
@@ -334,7 +367,6 @@ function VideoSection() {
             muted={muted}
             loop
             playsInline
-           
           />
 
           <div className={`video-overlay ${playing ? "playing" : "paused"}`}>
@@ -363,6 +395,9 @@ function VideoSection() {
                 max={1}
                 step={0.05}
                 value={volume}
+                onInput={(event) =>
+                  handleVolumeChange(Number(event.currentTarget.value))
+                }
                 onChange={(event) =>
                   handleVolumeChange(Number(event.target.value))
                 }
@@ -370,7 +405,7 @@ function VideoSection() {
             </label>
           </div>
 
-          <div className="video-seek">
+          <div className={`video-seek${isSeeking ? " seeking" : ""}`}>
             <span className="video-time">{formatTime(currentTime)}</span>
             <input
               type="range"
@@ -378,7 +413,13 @@ function VideoSection() {
               max={duration || 0}
               step={0.1}
               value={currentTime}
+              onPointerDown={startSeeking}
+              onPointerUp={stopSeeking}
+              onTouchStart={startSeeking}
+              onTouchEnd={stopSeeking}
+              onInput={(event) => seek(Number(event.currentTarget.value))}
               onChange={(event) => seek(Number(event.target.value))}
+              onBlur={stopSeeking}
             />
             <span className="video-time">{formatTime(duration)}</span>
           </div>
@@ -436,20 +477,10 @@ const STORAGE_KEY = "portfolio-gallery-items";
 
 function Gallery({ defaultItems }: { defaultItems: GalleryItem[] }) {
   const reduceMotion = useReducedMotion();
-  const swiperRef = useRef<any>(null);
+  const swiperRef = useRef<SwiperClass | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [items, setItems] = useState<GalleryItem[]>(defaultItems);
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  const saveItems = useCallback((nextItems: GalleryItem[]) => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextItems));
-    } catch {
-      // localStorage can be unavailable in some environments (e.g., private mode)
-    }
-  }, []);
-
-  const loadItems = useCallback(() => {
+  const loadStoredItems = () => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (!raw) return null;
@@ -459,14 +490,22 @@ function Gallery({ defaultItems }: { defaultItems: GalleryItem[] }) {
     } catch {
       return null;
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    const stored = loadItems();
-    if (stored && stored.length) {
-      setItems(stored);
+  const [items, setItems] = useState<GalleryItem[]>(() => {
+    const stored = typeof window !== "undefined" ? loadStoredItems() : null;
+    return stored && stored.length ? stored : defaultItems;
+  });
+
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const saveItems = useCallback((nextItems: GalleryItem[]) => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextItems));
+    } catch {
+      // localStorage can be unavailable in some environments (e.g., private mode)
     }
-  }, [loadItems]);
+  }, []);
 
   const ensureId = useCallback((item: GalleryItem) => {
     if (item.id) return item;
@@ -781,8 +820,8 @@ function Contact() {
   return (
     <Section id="contact" title="Contact">
       <p className="section-intro">
-        Interested in collaborating on an animated experience? Send a message and
-        I’ll reply within 1–2 business days.
+        Interested in collaborating on an animated experience? Send a message
+        and I’ll reply within 1–2 business days.
       </p>
 
       <div className="contact-grid">
