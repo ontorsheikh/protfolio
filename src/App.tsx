@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -12,6 +12,7 @@ import "swiper/css/pagination";
 import "./App.css";
 
 import devPhoto from "./assets/developer.jpg";
+import munnaHero from "./assets/munna-1.jpeg";
 import devVideo from "./assets/JENNIE - like JENNIE (Official Video) (1).mp4";
 
 const navItems = [
@@ -60,6 +61,75 @@ const sectionVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+// Spider Web Background Component
+function SpiderWebBackground() {
+  return (
+    <svg
+      className="spider-web-bg"
+      viewBox="0 0 1920 1080"
+      preserveAspectRatio="xMidYMid slice"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        zIndex: 0,
+        pointerEvents: "none",
+        opacity: 0.6,
+      }}
+    >
+      {/* Radial web lines */}
+      {Array.from({ length: 16 }).map((_, i) => {
+        const angle = (i / 16) * Math.PI * 2;
+        const x2 = 960 + Math.cos(angle) * 800;
+        const y2 = 540 + Math.sin(angle) * 600;
+        return (
+          <line
+            key={`radial-${i}`}
+            x1="960"
+            y1="540"
+            x2={x2}
+            y2={y2}
+            stroke="rgba(220, 20, 60, 0.4)"
+            strokeWidth="1.5"
+            style={{
+              animation: `spiderWebPulse ${3 + i * 0.1}s ease-in-out infinite`,
+            }}
+          />
+        );
+      })}
+
+      {/* Concentric circles */}
+      {[120, 200, 280, 360, 440, 520].map((radius, i) => (
+        <circle
+          key={`circle-${i}`}
+          cx="960"
+          cy="540"
+          r={radius}
+          fill="none"
+          stroke="rgba(220, 20, 60, 0.35)"
+          strokeWidth="1.5"
+          style={{
+            animation: `spiderWebGlow ${4 + i * 0.2}s ease-in-out infinite`,
+          }}
+        />
+      ))}
+
+      {/* Central web node */}
+      <circle
+        cx="960"
+        cy="540"
+        r="8"
+        fill="rgba(220, 20, 60, 0.8)"
+        style={{
+          animation: "spiderWebCenter 2s ease-in-out infinite",
+        }}
+      />
+    </svg>
+  );
+}
+
 function Header() {
   const [open, setOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() =>
@@ -79,7 +149,7 @@ function Header() {
     <header className="site-header">
       <div className="container header-inner">
         <a className="brand" href="#hero">
-          MD PANNA SHEIKH
+          MD. MUNNA KHANDAKAR
         </a>
 
         <button
@@ -130,7 +200,7 @@ function Hero() {
           transition={{ duration: reduceMotion ? 0 : 0.6, ease: "easeOut" }}
         >
           <h1>
-            Hi, I’m <span className="highlight">MD PANNA SHEIKH</span>
+            Hi, I’m <span className="highlight">MD. MUNNA KHANDAKAR</span>
           </h1>
           <p>
             I build animated web experiences that are fast, accessible, and
@@ -155,7 +225,15 @@ function Hero() {
           transition={{ duration: reduceMotion ? 0 : 0.6, ease: "easeOut" }}
         >
           <div className="profile-card">
-            <div className="profile-photo" />
+            <img
+              src={munnaHero}
+              alt="MD MUNNA KHANDAKAR"
+              className="profile-photo"
+              style={{
+                objectFit: "cover",
+                borderRadius: "var(--radius)",
+              }}
+            />
             <div className="profile-details">
               <p className="profile-title">Full-stack Animator</p>
               <p className="profile-subtitle">React · Motion · UX</p>
@@ -174,7 +252,7 @@ function Section({
 }: {
   id: string;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <section id={id} className="section">
@@ -830,16 +908,16 @@ function Contact() {
             <div>
               <dt>Email</dt>
               <dd>
-                <a href="mailto:mbbachcu@gmail.com" className="text-link">
-                  mbbachcu@gmail.com
+                <a href="mailto:munnakhandaker960@gmail.com" className="text-link">
+                  munnakhandaker960@gmail.com
                 </a>
               </dd>
             </div>
             <div>
               <dt>Location</dt>
               <dd>
-                District: [Jhenaidah] Sub-district : [Soulokupa] <br></br>
-                Union : [Monohorpur] Village : [Bisnudia]
+                District: [Jhenaidah] Sub-district : [Jhenaidah] <br></br>
+                Union : [Harishankarpur] Village : [Voj-ghat]
               </dd>
             </div>
             <div>
@@ -866,7 +944,7 @@ function Contact() {
               `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
             );
 
-            const mailto = `mailto:mbbachcu@gmail.com?subject=${subject}&body=${body}`;
+            const mailto = `mailto:munnakhandaker960@gmail.com?subject=${subject}&body=${body}`;
             window.location.href = mailto;
 
             setSent(true);
@@ -1006,7 +1084,7 @@ export default function App() {
   const location = useLocation();
 
   useEffect(() => {
-    document.title = "Panna । Portfolio";
+    document.title = "Munna । Portfolio";
   }, []);
 
   // Scroll to top when changing routes
@@ -1016,6 +1094,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <SpiderWebBackground />
       <Header />
       <main>
         <Routes>

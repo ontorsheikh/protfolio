@@ -1,4 +1,6 @@
-const slider = new Swiper("#imageSlider", {
+/* global Swiper */
+
+new Swiper("#imageSlider", {
   modules: [
     Swiper.Autoplay,
     Swiper.Pagination,

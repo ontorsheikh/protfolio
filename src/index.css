@@ -28,10 +28,9 @@ body {
 }
 
 ::selection {
-  background: rgba(123, 92, 255, 0.35);
+  background: rgba(139, 0, 0, 0.5);
 }
 
 ::placeholder {
   color: rgba(255, 255, 255, 0.55);
 }
-
