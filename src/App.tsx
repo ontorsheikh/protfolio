@@ -61,8 +61,23 @@ const sectionVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-// Spider Web Background Component
+// Spider Web Background Component - Disabled on mobile for performance
 function SpiderWebBackground() {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth <= 768 : false,
+  );
+
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  // Skip rendering on mobile devices
+  if (isMobile) {
+    return null;
+  }
+
   return (
     <svg
       className="spider-web-bg"
@@ -229,6 +244,7 @@ function Hero() {
               src={munnaHero}
               alt="MD MUNNA KHANDAKAR"
               className="profile-photo"
+              loading="lazy"
               style={{
                 objectFit: "cover",
                 borderRadius: "var(--radius)",
@@ -445,6 +461,8 @@ function VideoSection() {
             muted={muted}
             loop
             playsInline
+            preload="none"
+            poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720'%3E%3Crect fill='%23000' width='1280' height='720'/%3E%3C/svg%3E"
           />
 
           <div className={`video-overlay ${playing ? "playing" : "paused"}`}>
@@ -908,7 +926,10 @@ function Contact() {
             <div>
               <dt>Email</dt>
               <dd>
-                <a href="mailto:munnakhandaker960@gmail.com" className="text-link">
+                <a
+                  href="mailto:munnakhandaker960@gmail.com"
+                  className="text-link"
+                >
                   munnakhandaker960@gmail.com
                 </a>
               </dd>
@@ -1000,7 +1021,12 @@ function Footer() {
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         >
-          <img className="footer-photo" src={devPhoto} alt="MD Ontor Sheikh" />
+          <img
+            className="footer-photo"
+            src={devPhoto}
+            alt="MD Ontor Sheikh"
+            loading="lazy"
+          />
           <div className="footer-meta">
             <p className="footer-name">MD ONTOR SHEIKH</p>
             <a className="footer-email" href={`mailto:${email}`}>
