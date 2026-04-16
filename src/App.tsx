@@ -12,7 +12,7 @@ import "swiper/css/pagination";
 import "./App.css";
 
 import devPhoto from "./assets/developer.jpg";
-import munnaHero from "./assets/munna-1.jpeg";
+import munnaHero from "./assets/profile-1.jfif";
 import devVideo from "./assets/JENNIE - like JENNIE (Official Video) (1).mp4";
 
 const navItems = [
