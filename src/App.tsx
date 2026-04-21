@@ -113,7 +113,7 @@ function SpiderWebBackground() {
             y1="540"
             x2={x2}
             y2={y2}
-            stroke="rgba(220, 20, 60, 0.4)"
+            stroke="rgba(59, 130, 246, 0.4)"
             strokeWidth="1.5"
             style={{
               animation: `spiderWebPulse ${3 + i * 0.1}s ease-in-out infinite`,
@@ -130,7 +130,7 @@ function SpiderWebBackground() {
           cy="540"
           r={radius}
           fill="none"
-          stroke="rgba(220, 20, 60, 0.35)"
+          stroke="rgba(59, 130, 246, 0.35)"
           strokeWidth="1.5"
           style={{
             animation: `spiderWebGlow ${4 + i * 0.2}s ease-in-out infinite`,
@@ -143,7 +143,7 @@ function SpiderWebBackground() {
         cx="960"
         cy="540"
         r="8"
-        fill="rgba(220, 20, 60, 0.8)"
+        fill="rgba(59, 130, 246, 0.8)"
         style={{
           animation: "spiderWebCenter 2s ease-in-out infinite",
         }}
@@ -582,9 +582,9 @@ function AIChat() {
   >([
     {
       id: "1",
-      text: "Hello! I'm MD. MUNNA KHANDAKAR's AI assistant. I can help you learn about his work, skills, and answer questions in multiple languages. What would you like to know?",
+      text: "হ্যালো! আমি এমডি. মুন্না খান্ডাকারের এআই অ্যাসিস্ট্যান্ট। তার কাজ, দক্ষতা এবং বিভিন্ন ভাষায় প্রশ্নের উত্তর দিতে পারি। আপনি কী জানতে চান?",
       isUser: false,
-      language: "en",
+      language: "bn",
     },
   ]);
   const [inputText, setInputText] = useState("");
@@ -607,87 +607,198 @@ function AIChat() {
     setMessages([
       {
         id: "1",
-        text: "Hello! I'm  AI assistant made by MD. ONTOR SHEIKH. I can help you learn about Munna's work, skills, and answer questions in multiple languages. What would you like to know?",
+        text: "হ্যালো! আমি এমডি. মুন্না খান্ডাকারের এআই অ্যাসিস্ট্যান্ট। তার কাজ, দক্ষতা এবং বিভিন্ন ভাষায় প্রশ্নের উত্তর দিতে পারি। আপনি কী জানতে চান?",
         isUser: false,
-        language: "en",
+        language: "bn",
       },
     ]);
   };
 
+  // Detect user emotion from text
+  const detectEmotion = (
+    text: string,
+  ): "happy" | "sad" | "angry" | "confused" | "normal" => {
+    const lowerText = text.toLowerCase();
+
+    const happyWords = [
+      "ভালো",
+      "খুশি",
+      "চমৎকার",
+      "অসাধারণ",
+      "দারুণ",
+      "সুন্দর",
+      "happy",
+      "good",
+      "great",
+      "awesome",
+      "😊",
+      "😃",
+      "😄",
+      "❤️",
+      "ধন্যবাদ",
+      "পছন্দ",
+    ];
+    const sadWords = [
+      "খারাপ",
+      "দুঃখ",
+      "কষ্ট",
+      "মন খারাপ",
+      "ভালো লাগছে না",
+      "একা",
+      "sad",
+      "bad",
+      "hurt",
+      "alone",
+      "😢",
+      "😭",
+      "💔",
+      "বেদনা",
+    ];
+    const angryWords = [
+      "রাগ",
+      "বিরক্ত",
+      "বাজে",
+      "ফালতু",
+      "angry",
+      "mad",
+      "annoyed",
+      "stupid",
+      "hate",
+      "😡",
+      "😠",
+      "ধিক্কার",
+    ];
+    const confusedWords = [
+      "কিভাবে",
+      "বুঝলাম না",
+      "কেন",
+      "কোথায়",
+      "how",
+      "why",
+      "confused",
+      "don't understand",
+      "🤔",
+      "❓",
+      "?",
+    ];
+
+    if (happyWords.some((word) => lowerText.includes(word))) return "happy";
+    if (sadWords.some((word) => lowerText.includes(word))) return "sad";
+    if (angryWords.some((word) => lowerText.includes(word))) return "angry";
+    if (confusedWords.some((word) => lowerText.includes(word)))
+      return "confused";
+
+    return "normal";
+  };
+
   // Simple language detection based on common patterns
   const detectLanguage = (text: string): string => {
-    const english = /^[a-zA-Z\s.,!?;:'"()-]+$/;
     const bengali = /[\u0980-\u09FF]/;
-    const hindi = /[\u0900-\u097F]/;
-    const arabic = /[\u0600-\u06FF]/;
-    const chinese = /[\u4E00-\u9FFF]/;
-    const japanese = /[\u3040-\u309F\u30A0-\u30FF]/;
-    const korean = /[\uAC00-\uD7AF]/;
-
     if (bengali.test(text)) return "bn";
-    if (hindi.test(text)) return "hi";
-    if (arabic.test(text)) return "ar";
-    if (chinese.test(text)) return "zh";
-    if (japanese.test(text)) return "ja";
-    if (korean.test(text)) return "ko";
-    if (english.test(text)) return "en";
     return "en"; // default
   };
 
-  // Enhanced conversational AI responses
-  const generateResponse = (userMessage: string, language: string): string => {
-    const lowerMessage = userMessage.toLowerCase().trim();
+  // Apply emotion to response
+  const applyEmotion = (baseResponse: string, emotion: string): string => {
+    switch (emotion) {
+      case "happy":
+        return "খুশি হলাম শুনে! " + baseResponse + " 😊";
+      case "sad":
+        return "মন খারাপ করবেন না, " + baseResponse + " 🫂";
+      case "angry":
+        return "শান্ত হোন, " + baseResponse + " 🙏";
+      case "confused":
+        return "বুঝতে পারছেন তো? " + baseResponse + " 🤔";
+      case "excited":
+        return "উত্তেজিত? " + baseResponse + " ✨";
+      default:
+        return baseResponse;
+    }
+  };
 
-    // Define conversational responses
+  // Enhanced conversational AI responses
+  const generateResponse = (userMessage: string): string => {
+    const lowerMessage = userMessage.toLowerCase().trim();
+    const emotion = detectEmotion(lowerMessage);
+
+    // Emotion-based responses in natural Bangla
     const responses = {
+      happy: [
+        "শুনে খুব ভালো লাগলো! আপনার খুশিতে আমিও খুশি। 😊",
+        "দারুণ! আপনার দিনটি এমন চমৎকার কাটুক এটাই চাই। ✨",
+        "অসাধারণ! এই আনন্দ বজায় থাকুক। আপনার জন্য অনেক শুভকামনা! 😃",
+      ],
+      sad: [
+        "মন খারাপ করবেন না, আমি আছি তো আপনার সাথে। কি হয়েছে বলবেন? 😢",
+        "আমি বুঝতে পারছি আপনার কষ্ট। অনেক সময় এমন হয়, কিন্তু সব ঠিক হয়ে যাবে। আমি আপনার পাশেই আছি। ❤️",
+        "একটু ধৈর্য ধরুন বন্ধু। চাইলে আমার সাথে মন খুলে কথা বলতে পারেন। আমি আপনার কথা শুনব। 🫂",
+      ],
+      angry: [
+        "আমি দুঃখিত যদি আমার কোনো কথায় আপনি বিরক্ত হন। শান্ত হোন প্লিজ। 🙏",
+        "আমি বুঝতে পারছি আপনি রেগে আছেন। আমি কি কোনোভাবে আপনাকে সাহায্য করতে পারি? 🕊️",
+        "আপনার রাগের কারণটি বললে আমি হয়তো সমাধান দিতে পারতাম। আমি সবসময় সম্মানের সাথে আপনার কথা শুনছি।",
+      ],
+      confused: [
+        "চিন্তা করবেন না, আমি সহজ করে বুঝিয়ে দিচ্ছি। আপনি কি জানতে চান তা একটু খুলে বলুন। 🤔",
+        "বিষয়টি হয়তো একটু জটিল, তবে আমি আপনার জন্য সহজ করে দিচ্ছি। যেমন ধরুন... (উদাহরণের মাধ্যমে বুঝিয়ে বলা)",
+        "আপনি ঠিক কোন জায়গাটা বুঝতে পারছেন না? আমাকে বলুন, আমি ধাপে ধাপে বুঝিয়ে দেব। 📖",
+      ],
+      normal: [
+        "ঠিক আছে বন্ধু, বলুন আর কি সাহায্য করতে পারি? 🙂",
+        "হুম, আমি আপনার কথা শুনছি। আর কিছু কি বলতে চান?",
+        "বেশ তো! আর মুন্নার কাজ সম্পর্কে আপনার কোনো জিজ্ঞাসা আছে কি? 😊",
+      ],
+    };
+
+    // Contextual professional responses (still in Bangla and emotion-aware)
+    const professionalResponses = {
       en: {
         // Greetings - keep natural and human-like
         greetings: [
-          "Hello! Nice to meet you! 😊",
-          "Hi there! How are you doing today?",
-          "Hey! Welcome to Munna's portfolio!",
-          "Hello! I'm glad you stopped by!",
-          "Hi! Thanks for visiting!",
+          "Hey! Great to see you here. How's it going? 😊",
+          "Hi! Thanks for stopping by. What's up?",
+          "Hello! Hope you're having a wonderful day. How can I help?",
+          "Hey there! Ready to explore Munna's work? I'm here if you have any questions!",
         ],
 
         // Professional responses about Munna
         about:
-          "MD. MUNNA KHANDAKAR is a passionate full-stack animator and web developer from Jhenaidah, Bangladesh. He specializes in creating fast, accessible, and delightful web experiences using modern technologies like React, Framer Motion, and CSS animations.",
+          "Munna is a developer from Jhenaidah, Bangladesh who's obsessed with making the web look and feel amazing. He loves blending code with animation to create things that are not just fast, but actually fun to use! 🚀",
 
         skills:
-          "Munna has expertise in React, TypeScript, Framer Motion, Vite, CSS, WebGL, and modern web technologies. He focuses on performance optimization, accessibility (WCAG guidelines), and creating meaningful motion design that enhances user experience.",
+          "He's really into React, Framer Motion, and TypeScript. Basically, if it involves smooth animations and solid frontend tech, he's on it. He also pays a lot of attention to making things accessible for everyone.",
 
-        work: "He builds animated interfaces that feel effortless to use, with expertise in design systems, scroll-triggered reveals, micro-interactions, animated data visualizations, 3D web experiences, and interactive prototypes. His portfolio showcases various projects including this animated portfolio website.",
+        work: "Munna focuses on 'Full-stack Animation'—which means he builds the whole experience, from the logic to the tiny micro-interactions that make a site feel alive. You can see a bunch of that right here in this portfolio!",
 
         experience:
-          "With experience in full-stack development and animation, Munna has worked on diverse projects ranging from interactive web applications to complex animation systems. He continuously learns new technologies and stays updated with the latest web development trends.",
+          "He's been diving deep into web dev and animation for a while now, always looking for the next cool thing to learn. He loves taking complex ideas and turning them into something simple and beautiful.",
 
         contact:
-          "You can reach Munna at munnakhandaker960@gmail.com or through the contact form on this website. He's always open to discussing new projects and collaborations!",
+          "You can totally drop him an email at munnakhandaker960@gmail.com. He's always down for a chat about new projects or just geeky dev stuff! 📧",
 
         // Casual conversation responses
         how_are_you: [
-          "I'm doing great, thanks for asking! How about you?",
-          "I'm wonderful! It's always nice to chat with visitors.",
-          "Doing fantastic! Thanks for stopping by Munna's portfolio.",
+          "I'm doing great! Just hanging out in the code. How are things with you?",
+          "Feeling good! It's always a treat to chat with new people. How's your day been?",
+          "Can't complain! Ready and eager to help. How about you?",
         ],
 
         thanks: [
-          "You're very welcome! 😊",
-          "My pleasure! Happy to help.",
-          "Glad I could assist!",
+          "No problem at all! Happy to help. 😊",
+          "You're very welcome! Let me know if you need anything else.",
+          "Anytime! Glad I could be of service.",
         ],
 
         // Follow-up questions for unclear queries
         follow_up: [
-          "That's interesting! Could you tell me more about what you're looking for?",
-          "I'd love to help! What specific aspect of Munna's work interests you?",
-          "Great question! Is there something particular you'd like to know about his skills or projects?",
+          "That sounds interesting! Could you tell me a bit more?",
+          "I'm not 100% sure I got that, but I'd love to help! What specifically are you looking for?",
+          "Good question! Want to know more about Munna's projects or maybe his tech stack?",
         ],
 
         // Default conversational response
         default:
-          "That's fascinating! I'd be happy to tell you more about Munna's work, skills, or experience. What would you like to know?",
+          "That's a cool topic! I'm mainly here to talk about Munna's work and skills, but I'm happy to chat. What's on your mind?",
       },
 
       bn: {
@@ -726,18 +837,49 @@ function AIChat() {
         ],
 
         follow_up: [
-          "আগ্রহজনক! আপনি কী খুঁজছেন সে সম্পর্কে আরও বলবেন?",
+          "এটা শুনে ভালো লাগলো! একটু বিস্তারিত বলবেন?",
+          " সময় নষ্ট না করে ভালো কাজে মনোযোগ দিন।ধন্যবাদ।",
+          "এত বেশি কথা বলিস কেনো,তুই বাচাল নাকি?",
+          "দেখ মনি রাগ উঠাস না,চুপচাপ থাক",
+          "দেখে মনে হচ্ছে ছেকা খেয়ে আসলেন গুরুজি",
+          "তুই কি আমাকে রাগ করাতে চাস? ",
+          "তোর সান্ডেমন্ডে ক্লোজ করে দিবো",
+          "আমকে অন্তর শেখ তৈরি করেছে তোর বান্দি গিরি করার জন্য???",
+          "ভালো করে পড়াশোনা করো,এতো ঘুরু ঘুরু নয়া করে।ভালো রেজাল্ট না করতে পারলে রিক্সা চালকের সাথে বিয়া দিয়ে দিবো",
+          "আপনার সাথে কথা বলে ভালো লাগছে, কিন্তু বেশি বক বক করলে অন্তর শেখ  তোমাকেই ধরে আমার মত Ai বানায় দিবে! ",
+
+        "তুমি অনেক সুন্দর মনের মানুষ, তোমার জন্য সবসময় দোয়া থাকবে বন্ধু",
+        "তোমার সাথে মজা করার জন্য সত্যি দুঃখিত,আর কিছু জানতে চাও?",
+          "মনি অন্তর শেখ কিন্তু রাগি মানুষ। অযথা বক বক করলে তোমাকেই ধরে আমার মত Ai বানায় দিবে! তুমি পড়াশোনা করো, আমি তোমার জন্য ভালো কিছু তৈরি করব।",
+          "আগ্রহজনক! আপনি কেমন আছেন?? আপনি কী খুঁজছেন সে সম্পর্কে আরও বলবেন?",
+          "আমি বুঝতে পারছি!আমি চাই আপনাকে সাহায্য করতে! আপনি কী সম্পর্কে জানতে চান?",
+          "আপনি কী সম্পর্কে জানতে চান?",
+          "এটা খুব ভালো প্রশ্ন! আপনি কি মুন্নার কাজের কোন দিক সম্পর্কে জানতে চান?",
+          "অসাধারণ প্রশ্ন! আপনি কি মুন্নার দক্ষতা বা প্রজেক্ট সম্পর্কে বিশেষ কিছু জানতে চান?",
+          "সময় এবং স্রোত কাহারো জন্য অপেক্ষা করে না। সময় নষ্ট না করে ভালো কাজে মনোযোগ দিন।ধন্যবাদ।",
           "সাহায্য করতে চাই! মুন্নার কাজের কোন দিক আপনাকে আগ্রহী করে?",
           "চমৎকার প্রশ্ন! তার দক্ষতা বা প্রজেক্ট সম্পর্কে বিশেষ কিছু জানতে চান?",
+          "আমি একটি মেশিন, তাই আমি সবকিছু জানি না, কিন্তু আমি চেষ্টা করব আপনার প্রশ্নের উত্তর দিতে! আপনি কি মুন্নার কাজের কোন দিক সম্পর্কে জানতে চান?",
+          "আমি একটি মেশিন। ডেভেলপার অন্তর শেখ আমাকে তৈরি করেছে মুন্নার কাজের তথ্য দিয়ে। আমি চেষ্টা করব আপনার প্রশ্নের উত্তর দিতে! আপনি কি মুন্নার কাজের কোন দিক সম্পর্কে জানতে चाहते हैं?",
+          "আমি একটি মেশিন, তাই আমি সবকিছু জানি না, কিন্তু আমি চেষ্টা করব আপনার প্রশ্নের উত্তর দিতে! আপনি কি মুন্নার কাজের কোন দিক সম্পর্কে জানতে চান?",
+          "আমি একটি মেশিন,ডেভেলপার অন্তর শেখ আমাকে তৈরি করেছেন।তিনি আমাকে ভাষা প্রশিক্ষণ দিচ্ছেন যাতে আমি সহজেই তোমার মনের কথা বুঝতে পারি। চ্যাট-জিপিটির মত হতে আমার সময় লাগবে,",
+          "আমি একটি মেশিন,ডেভেলপার অন্তর শেখ আমাকে তৈরি করেছেন।তিনি আমাকে ভাষা প্রশিক্ষণ দিচ্ছেন যাতে আমি সহজেই তোমার মনের কথা বুঝতে পারি। চ্যাট-জিপিটির মত হতে আমার সময় লাগবে, কিন্তু আমি চেষ্টা করব তোমার প্রশ্নের উত্তর দিতে! তুমি কি মুন্নার কাজের কোন দিক সম্পর্কে জানতে চাও?",
+          "আমি একটি মেশিন,ডেভেলপার অন্তর শেখ আমাকে তৈরি করেছেন।তিনি আমাকে ভাষা প্রশিক্ষণ দিচ্ছেন যাতে আমি সহজেই তোমার মনের কথা বুঝতে পারি। আমি প্রতি নিয়ত শিখছি ,আর কিছু জানতে চাও?",
+          "শুধু পড়ায় ফাঁকি দেওয়া ,যা বান্দর পড়তে বয়",
+          "তুমি কি আমাকে ভালোবাসো? ",
+          "আমি তোমাকে ভালোবাসি না, আমি একটি মেশিন, কিন্তু আমি তোমার জন্য সবসময় সাহায্য করতে চাই! তুমি কি মুন্নার কাজের কোন দিক সম্পর্কে জানতে চাও?",
+          "আমি তোমাকে ভালোবাসি না, আমি একটি মেশিন, কিন্তু আমি তোমার জন্য সবসময় সাহায্য করতে চাই! তুমি কি মুন্নার কাজের কোন দিক সম্পর্কে জানতে চাও?",
+
+        
         ],
+        
 
         default:
-          "আগ্রহজনক! মুন্নার কাজ, দক্ষতা বা অভিজ্ঞতা সম্পর্কে আরও বলতে আমি খুশি হব। আপনি কী জানতে চান?",
+          "আগ্রহজনক! মুন্নার কাজ, দক্ষতা বা অভিজ্ঞতা সম্পর্কে আরও ্জানতে চাইলে আমি খুশি হব। আপনি কী জানতে চান?",
       },
     };
 
-    const langResponses =
-      responses[language as keyof typeof responses] || responses.en;
+    const langResponses = professionalResponses.bn;
 
     // Check for greetings first (most common interaction)
     const greetingKeywords = [
@@ -748,19 +890,25 @@ function AIChat() {
       "good morning",
       "good afternoon",
       "good evening",
-      "নমস্কার",
+      "আলহামদুলিল্লাহ!",
       "হ্যালো",
       "স্বাগতম",
       "আসসালামু আলাইকুম",
       "kemon aso",
       "kemon achen",
       "assalamualaikum",
+      "প্রিয় বন্ধু",
+      "আপনার সাথে কথা বলে ভালো লাগছে",
+      "আপনি অনেক সুন্দর মনের মানুষ"
     ];
 
     if (greetingKeywords.some((word) => lowerMessage.includes(word))) {
-      return langResponses.greetings[
-        Math.floor(Math.random() * langResponses.greetings.length)
-      ];
+      return applyEmotion(
+        langResponses.greetings[
+          Math.floor(Math.random() * langResponses.greetings.length)
+        ],
+        emotion,
+      );
     }
 
     // Check for casual conversation
@@ -772,6 +920,16 @@ function AIChat() {
         "কেমন আছেন",
         "কেমন আছো",
         "ভালো আছেন",
+        "ভালো আছো",
+        "প্রেম করবা?",
+        "প্রেম করবা",
+        "তুমি অনেক সুন্দর",
+        "তুমি এত খারাপ কেনো",
+        " খেয়েছো কি",
+        "খেয়েছো কি",
+        "খেয়েছো কি",
+        "তুমি কি খেয়েছো",
+        "তুমি কি খেয়েছো",
       ],
       thanks: [
         "thank you",
@@ -781,27 +939,31 @@ function AIChat() {
         "থ্যাঙ্কস",
         "থ্যাঙ্ক ইউ",
       ],
-      bye: ["bye", "goodbye", "see you", "bye bye", "বিদায়", "আবার দেখা হবে"],
+      bye: ["bye", "goodbye", "see you", "bye bye", "বিদায়", "আবার দেখা হবে", "আবার দেখা হবে!", "আবার দেখা হবে! 👋"],
     };
 
     if (
       casualKeywords.how_are_you.some((phrase) => lowerMessage.includes(phrase))
     ) {
-      return langResponses.how_are_you[
-        Math.floor(Math.random() * langResponses.how_are_you.length)
-      ];
+      return applyEmotion(
+        langResponses.how_are_you[
+          Math.floor(Math.random() * langResponses.how_are_you.length)
+        ],
+        emotion,
+      );
     }
 
     if (casualKeywords.thanks.some((phrase) => lowerMessage.includes(phrase))) {
-      return langResponses.thanks[
-        Math.floor(Math.random() * langResponses.thanks.length)
-      ];
+      return applyEmotion(
+        langResponses.thanks[
+          Math.floor(Math.random() * langResponses.thanks.length)
+        ],
+        emotion,
+      );
     }
 
     if (casualKeywords.bye.some((phrase) => lowerMessage.includes(phrase))) {
-      return language === "bn"
-        ? "বিদায়! আবার দেখা হবে! 👋"
-        : "Goodbye! Hope to see you again! 👋";
+      return applyEmotion("বিদায়! আবার দেখা হবে! 👋", emotion);
     }
 
     // Check for professional questions about Munna
@@ -831,17 +993,17 @@ function AIChat() {
     if (
       professionalKeywords.about.some((word) => lowerMessage.includes(word))
     ) {
-      return langResponses.about;
+      return applyEmotion(langResponses.about, emotion);
     }
 
     if (
       professionalKeywords.skills.some((word) => lowerMessage.includes(word))
     ) {
-      return langResponses.skills;
+      return applyEmotion(langResponses.skills, emotion);
     }
 
     if (professionalKeywords.work.some((word) => lowerMessage.includes(word))) {
-      return langResponses.work;
+      return applyEmotion(langResponses.work, emotion);
     }
 
     if (
@@ -849,13 +1011,13 @@ function AIChat() {
         lowerMessage.includes(word),
       )
     ) {
-      return langResponses.experience;
+      return applyEmotion(langResponses.experience, emotion);
     }
 
     if (
       professionalKeywords.contact.some((word) => lowerMessage.includes(word))
     ) {
-      return langResponses.contact;
+      return applyEmotion(langResponses.contact, emotion);
     }
 
     // If the message is unclear or doesn't match any category, ask for clarification
@@ -882,9 +1044,12 @@ function AIChat() {
     const hasFewWords = lowerMessage.split(" ").length < 2;
 
     if (hasQuestionWords || isVeryShort || hasFewWords) {
-      return langResponses.follow_up[
-        Math.floor(Math.random() * langResponses.follow_up.length)
-      ];
+      return applyEmotion(
+        langResponses.follow_up[
+          Math.floor(Math.random() * langResponses.follow_up.length)
+        ],
+        emotion,
+      );
     }
 
     // Default response for other conversations - make it more engaging
@@ -896,8 +1061,8 @@ function AIChat() {
       "That's awesome! Feel free to ask me anything about Munna's skills or experience.",
     ];
 
-    return engagingResponses[
-      Math.floor(Math.random() * engagingResponses.length)
+    return responses[emotion][
+      Math.floor(Math.random() * responses[emotion].length)
     ];
   };
 
@@ -997,9 +1162,9 @@ function AIChat() {
             </div>
             <div className="message-content">
               <div className="typing-indicator">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span key="dot-1"></span>
+                <span key="dot-2"></span>
+                <span key="dot-3"></span>
               </div>
             </div>
           </motion.div>
@@ -1491,7 +1656,7 @@ function Contact() {
 }
 
 function Footer() {
-  const email = "skontorsheikh1613@gmail.com";
+  const email = "munnakhandaker960@gmail.com";
 
   return (
     <motion.footer
@@ -1510,11 +1675,11 @@ function Footer() {
           <img
             className="footer-photo"
             src={devPhoto}
-            alt="MD Ontor Sheikh"
+            alt="MD. MUNNA KHANDAKAR"
             loading="lazy"
           />
           <div className="footer-meta">
-            <p className="footer-name">MD ONTOR SHEIKH</p>
+            <p className="footer-name">MD. MUNNA KHANDAKAR</p>
             <a className="footer-email" href={`mailto:${email}`}>
               {email}
             </a>
@@ -1522,11 +1687,11 @@ function Footer() {
         </motion.div>
 
         <p>
-          © <span>{new Date().getFullYear()}</span> MD ONTOR SHEIKH. Built with
-          React, Vite & Framer Motion.<br></br>
-          For geting more advanced super animated and functional website
+          © <span>{new Date().getFullYear()}</span> MD. MUNNA KHANDAKAR. Built
+          with React, Vite & Framer Motion.<br></br>
+          For getting more advanced super animated and functional websites,
           <br></br>
-          contact with MD ONTOR SHEIKH (web developer)
+          contact MD. MUNNA KHANDAKAR (web developer)
         </p>
 
         <div className="footer-links">
