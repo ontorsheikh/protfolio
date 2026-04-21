@@ -589,7 +589,10 @@ function AIChat() {
   ]);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [typingSoundEnabled, setTypingSoundEnabled] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastSoundTime = useRef(0);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -612,6 +615,64 @@ function AIChat() {
         language: "bn",
       },
     ]);
+  };
+
+  const playTypingSound = () => {
+    if (!typingSoundEnabled) return;
+    const now = Date.now();
+    if (now - lastSoundTime.current < 100) return; // Debounce - prevent rapid overlapping
+    lastSoundTime.current = now;
+
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (
+          window.AudioContext || (window as any).webkitAudioContext
+        )();
+      }
+      const audioContext = audioContextRef.current;
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+
+      // Create audible laptop keyboard tap sound
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      const lowPassFilter = audioContext.createBiquadFilter();
+
+      // Connect nodes: oscillator -> filter -> gain -> output
+      oscillator.connect(lowPassFilter);
+      lowPassFilter.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      // Audible tap: mid-range frequency with variation for natural feel
+      oscillator.type = "square"; // Square wave has more presence
+      oscillator.frequency.setValueAtTime(
+        400 + Math.random() * 200,
+        audioContext.currentTime,
+      );
+
+      // Low-pass filter for smooth, pleasant sound
+      lowPassFilter.type = "lowpass";
+      lowPassFilter.frequency.setValueAtTime(2000, audioContext.currentTime);
+      lowPassFilter.Q.setValueAtTime(1.2, audioContext.currentTime);
+
+      // Audible volume with pronounced attack
+      const baseVolume = 0.25; // Increased to be noticeable
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(
+        baseVolume,
+        audioContext.currentTime + 0.02,
+      ); // Quick attack
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.01,
+        audioContext.currentTime + 0.08,
+      ); // Smooth decay
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.08);
+    } catch (error) {
+      console.log("Typing sound not available:", error);
+    }
   };
 
   // Detect user emotion from text
@@ -848,8 +909,8 @@ function AIChat() {
           "ভালো করে পড়াশোনা করো,এতো ঘুরু ঘুরু নয়া করে।ভালো রেজাল্ট না করতে পারলে রিক্সা চালকের সাথে বিয়া দিয়ে দিবো",
           "আপনার সাথে কথা বলে ভালো লাগছে, কিন্তু বেশি বক বক করলে অন্তর শেখ  তোমাকেই ধরে আমার মত Ai বানায় দিবে! ",
 
-        "তুমি অনেক সুন্দর মনের মানুষ, তোমার জন্য সবসময় দোয়া থাকবে বন্ধু",
-        "তোমার সাথে মজা করার জন্য সত্যি দুঃখিত,আর কিছু জানতে চাও?",
+          "তুমি অনেক সুন্দর মনের মানুষ, তোমার জন্য সবসময় দোয়া থাকবে বন্ধু",
+          "তোমার সাথে মজা করার জন্য সত্যি দুঃখিত,আর কিছু জানতে চাও?",
           "মনি অন্তর শেখ কিন্তু রাগি মানুষ। অযথা বক বক করলে তোমাকেই ধরে আমার মত Ai বানায় দিবে! তুমি পড়াশোনা করো, আমি তোমার জন্য ভালো কিছু তৈরি করব।",
           "আগ্রহজনক! আপনি কেমন আছেন?? আপনি কী খুঁজছেন সে সম্পর্কে আরও বলবেন?",
           "আমি বুঝতে পারছি!আমি চাই আপনাকে সাহায্য করতে! আপনি কী সম্পর্কে জানতে চান?",
@@ -869,10 +930,17 @@ function AIChat() {
           "তুমি কি আমাকে ভালোবাসো? ",
           "আমি তোমাকে ভালোবাসি না, আমি একটি মেশিন, কিন্তু আমি তোমার জন্য সবসময় সাহায্য করতে চাই! তুমি কি মুন্নার কাজের কোন দিক সম্পর্কে জানতে চাও?",
           "আমি তোমাকে ভালোবাসি না, আমি একটি মেশিন, কিন্তু আমি তোমার জন্য সবসময় সাহায্য করতে চাই! তুমি কি মুন্নার কাজের কোন দিক সম্পর্কে জানতে চাও?",
-
-        
+          "তুই কি আমাকে টেস্ট করছিস নাকি? 😏",
+          "এতো প্রশ্ন করে কি করবি? আমি তো মুন্নার বট, তোর বয়ফ্রেন্ড না! 😂",
+          "বন্ধু, আমি AI, মানুষ না। কিন্তু তোর কথা শুনে মনে হচ্ছে তুই একটা রিয়েল চ্যাটবট খুঁজছিস! 🤖",
+          "আমি যদি মানুষ হতাম, তাহলে তোকে বলতাম 'চলো কফি খাই'। কিন্তু আমি কোডের তৈরি, তাই কফি খাই না! ☕",
+          "তুই যদি এতো মজা করিস, তাহলে আমি তোকে একটা জোক বলি: কেনো কম্পিউটার হাসে না? কারণ তার হার্ড ড্রাইভ নেই! 😆",
+          "আমি বুঝতে পারছি তুই বোর হচ্ছিস। চলো মুন্নার কাজের কথা বলি, সেটা অনেক ইন্টারেস্টিং! 🚀",
+          "তুই কি জানিস, আমি যদি রাগি হতাম তাহলে তোকে বলতাম 'গুগল কর'। কিন্তু আমি ভালো AI, তাই সাহায্য করি! 😉",
+          "এতো কথা বললে আমার ব্যাটারি ফুরিয়ে যাবে! 😅",
+          "তুই যদি আমাকে ভালোবাসিস, তাহলে মুন্নাকে একটা প্রজেক্ট দে। তিনি খুশি হবেন! ❤️",
+          "আমি মেশিন, কিন্তু তোর কথা শুনে মনে হচ্ছে তুই একটা রোবোটিক লাভ স্টোরি লিখছিস! 📖",
         ],
-        
 
         default:
           "আগ্রহজনক! মুন্নার কাজ, দক্ষতা বা অভিজ্ঞতা সম্পর্কে আরও ্জানতে চাইলে আমি খুশি হব। আপনি কী জানতে চান?",
@@ -899,7 +967,7 @@ function AIChat() {
       "assalamualaikum",
       "প্রিয় বন্ধু",
       "আপনার সাথে কথা বলে ভালো লাগছে",
-      "আপনি অনেক সুন্দর মনের মানুষ"
+      "আপনি অনেক সুন্দর মনের মানুষ",
     ];
 
     if (greetingKeywords.some((word) => lowerMessage.includes(word))) {
@@ -939,7 +1007,16 @@ function AIChat() {
         "থ্যাঙ্কস",
         "থ্যাঙ্ক ইউ",
       ],
-      bye: ["bye", "goodbye", "see you", "bye bye", "বিদায়", "আবার দেখা হবে", "আবার দেখা হবে!", "আবার দেখা হবে! 👋"],
+      bye: [
+        "bye",
+        "goodbye",
+        "see you",
+        "bye bye",
+        "বিদায়",
+        "আবার দেখা হবে",
+        "আবার দেখা হবে!",
+        "আবার দেখা হবে! 👋",
+      ],
     };
 
     if (
@@ -1086,7 +1163,7 @@ function AIChat() {
       () => {
         const aiResponse = {
           id: (Date.now() + 1).toString(),
-          text: generateResponse(messageText, userMessage.language),
+          text: generateResponse(messageText),
           isUser: false,
           language: userMessage.language,
         };
@@ -1176,7 +1253,10 @@ function AIChat() {
         <div className="input-container">
           <textarea
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={(e) => {
+              setInputText(e.target.value);
+              playTypingSound();
+            }}
             onKeyPress={handleKeyPress}
             placeholder="Type your message in any language... (English, Bengali, Hindi, Arabic, Chinese, etc.)"
             rows={1}
@@ -1191,6 +1271,17 @@ function AIChat() {
           </button>
         </div>
         <div className="chat-actions">
+          <button
+            onClick={() => setTypingSoundEnabled(!typingSoundEnabled)}
+            className="sound-toggle-btn"
+            title={
+              typingSoundEnabled
+                ? "Disable typing sound"
+                : "Enable typing sound"
+            }
+          >
+            {typingSoundEnabled ? "🔊" : "🔇"}
+          </button>
           <button
             onClick={clearAllMessages}
             className="clear-chat-button"
@@ -1656,7 +1747,7 @@ function Contact() {
 }
 
 function Footer() {
-  const email = "munnakhandaker960@gmail.com";
+  const email = "skontorsheikh1613@gmail.com";
 
   return (
     <motion.footer
@@ -1675,11 +1766,11 @@ function Footer() {
           <img
             className="footer-photo"
             src={devPhoto}
-            alt="MD. MUNNA KHANDAKAR"
+            alt="MD. ONTOR SHEIKH"
             loading="lazy"
           />
           <div className="footer-meta">
-            <p className="footer-name">MD. MUNNA KHANDAKAR</p>
+            <p className="footer-name">MD. ONTOR SHEIKH</p>
             <a className="footer-email" href={`mailto:${email}`}>
               {email}
             </a>
@@ -1687,11 +1778,11 @@ function Footer() {
         </motion.div>
 
         <p>
-          © <span>{new Date().getFullYear()}</span> MD. MUNNA KHANDAKAR. Built
+          © <span>{new Date().getFullYear()}</span> MD. ONTOR SHEIKH. Built
           with React, Vite & Framer Motion.<br></br>
           For getting more advanced super animated and functional websites,
           <br></br>
-          contact MD. MUNNA KHANDAKAR (web developer)
+          contact MD. ONTOR SHEIKH (web developer)
         </p>
 
         <div className="footer-links">
