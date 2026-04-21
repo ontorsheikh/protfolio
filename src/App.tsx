@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useRef, useState, ReactNode } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  ReactNode,
+} from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -19,6 +25,7 @@ const navItems = [
   { label: "Home", to: "/" },
   { label: "About", to: "/about" },
   { label: "Work", to: "/work" },
+  { label: "AI Chat", to: "/ai-chat" },
   { label: "Contact", to: "/contact" },
 ];
 
@@ -555,6 +562,485 @@ function WorkPage() {
 
 function ContactPage() {
   return <Contact />;
+}
+
+function AIChatPage() {
+  return (
+    <Section id="ai-chat" title="AI Assistant">
+      <p className="section-intro">
+        Chat with my AI assistant in multiple languages. Ask about my work,
+        skills, or anything related to web development and animation.
+      </p>
+      <AIChat />
+    </Section>
+  );
+}
+
+function AIChat() {
+  const [messages, setMessages] = useState<
+    Array<{ id: string; text: string; isUser: boolean; language?: string }>
+  >([
+    {
+      id: "1",
+      text: "Hello! I'm MD. MUNNA KHANDAKAR's AI assistant. I can help you learn about his work, skills, and answer questions in multiple languages. What would you like to know?",
+      isUser: false,
+      language: "en",
+    },
+  ]);
+  const [inputText, setInputText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const deleteMessage = (messageId: string) => {
+    setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
+  };
+
+  const clearAllMessages = () => {
+    setMessages([
+      {
+        id: "1",
+        text: "Hello! I'm  AI assistant made by MD. ONTOR SHEIKH. I can help you learn about Munna's work, skills, and answer questions in multiple languages. What would you like to know?",
+        isUser: false,
+        language: "en",
+      },
+    ]);
+  };
+
+  // Simple language detection based on common patterns
+  const detectLanguage = (text: string): string => {
+    const english = /^[a-zA-Z\s.,!?;:'"()-]+$/;
+    const bengali = /[\u0980-\u09FF]/;
+    const hindi = /[\u0900-\u097F]/;
+    const arabic = /[\u0600-\u06FF]/;
+    const chinese = /[\u4E00-\u9FFF]/;
+    const japanese = /[\u3040-\u309F\u30A0-\u30FF]/;
+    const korean = /[\uAC00-\uD7AF]/;
+
+    if (bengali.test(text)) return "bn";
+    if (hindi.test(text)) return "hi";
+    if (arabic.test(text)) return "ar";
+    if (chinese.test(text)) return "zh";
+    if (japanese.test(text)) return "ja";
+    if (korean.test(text)) return "ko";
+    if (english.test(text)) return "en";
+    return "en"; // default
+  };
+
+  // Enhanced conversational AI responses
+  const generateResponse = (userMessage: string, language: string): string => {
+    const lowerMessage = userMessage.toLowerCase().trim();
+
+    // Define conversational responses
+    const responses = {
+      en: {
+        // Greetings - keep natural and human-like
+        greetings: [
+          "Hello! Nice to meet you! 😊",
+          "Hi there! How are you doing today?",
+          "Hey! Welcome to Munna's portfolio!",
+          "Hello! I'm glad you stopped by!",
+          "Hi! Thanks for visiting!",
+        ],
+
+        // Professional responses about Munna
+        about:
+          "MD. MUNNA KHANDAKAR is a passionate full-stack animator and web developer from Jhenaidah, Bangladesh. He specializes in creating fast, accessible, and delightful web experiences using modern technologies like React, Framer Motion, and CSS animations.",
+
+        skills:
+          "Munna has expertise in React, TypeScript, Framer Motion, Vite, CSS, WebGL, and modern web technologies. He focuses on performance optimization, accessibility (WCAG guidelines), and creating meaningful motion design that enhances user experience.",
+
+        work: "He builds animated interfaces that feel effortless to use, with expertise in design systems, scroll-triggered reveals, micro-interactions, animated data visualizations, 3D web experiences, and interactive prototypes. His portfolio showcases various projects including this animated portfolio website.",
+
+        experience:
+          "With experience in full-stack development and animation, Munna has worked on diverse projects ranging from interactive web applications to complex animation systems. He continuously learns new technologies and stays updated with the latest web development trends.",
+
+        contact:
+          "You can reach Munna at munnakhandaker960@gmail.com or through the contact form on this website. He's always open to discussing new projects and collaborations!",
+
+        // Casual conversation responses
+        how_are_you: [
+          "I'm doing great, thanks for asking! How about you?",
+          "I'm wonderful! It's always nice to chat with visitors.",
+          "Doing fantastic! Thanks for stopping by Munna's portfolio.",
+        ],
+
+        thanks: [
+          "You're very welcome! 😊",
+          "My pleasure! Happy to help.",
+          "Glad I could assist!",
+        ],
+
+        // Follow-up questions for unclear queries
+        follow_up: [
+          "That's interesting! Could you tell me more about what you're looking for?",
+          "I'd love to help! What specific aspect of Munna's work interests you?",
+          "Great question! Is there something particular you'd like to know about his skills or projects?",
+        ],
+
+        // Default conversational response
+        default:
+          "That's fascinating! I'd be happy to tell you more about Munna's work, skills, or experience. What would you like to know?",
+      },
+
+      bn: {
+        greetings: [
+          "হ্যালো! আপনাকে দেখে ভালো লাগলো! 😊",
+          "নমস্কার! আজ কেমন আছেন?",
+          "স্বাগতম! মুন্নার পোর্টফোলিওতে আসার জন্য ধন্যবাদ!",
+          "হ্যালো! আপনি এখানে আসায় খুশি হলাম!",
+          "নমস্কার! ভিজিট করার জন্য ধন্যবাদ!",
+        ],
+
+        about:
+          "এমডি. মুন্না খান্ডাকার একজন আবেগপূর্ণ ফুল-স্ট্যাক অ্যানিমেটর এবং ওয়েব ডেভেলপার, যিনি ঝিনাইদাহ, বাংলাদেশ থেকে। তিনি আধুনিক প্রযুক্তি ব্যবহার করে দ্রুত, অ্যাক্সেসিবল এবং আনন্দদায়ক ওয়েব অভিজ্ঞতা তৈরিতে বিশেষজ্ঞ।",
+
+        skills:
+          "মুন্নার React, TypeScript, Framer Motion, Vite, CSS, WebGL এবং আধুনিক ওয়েব প্রযুক্তিতে দক্ষতা রয়েছে। তিনি পারফরম্যান্স অপটিমাইজেশন, অ্যাক্সেসিবিলিটি এবং ব্যবহারকারীর অভিজ্ঞতা বাড়ানোর জন্য অর্থবহ মোশন ডিজাইনে ফোকাস করেন।",
+
+        work: "তিনি অ্যানিমেটেড ইন্টারফেস তৈরি করেন যা ব্যবহার করা সহজ, এতে দক্ষতা রয়েছে ডিজাইন সিস্টেম, স্ক্রল-ট্রিগার্ড রিভিল, মাইক্রো-ইন্টার্যাকশন, অ্যানিমেটেড ডেটা ভিজুয়ালাইজেশন এবং ইন্টারেক্টিভ প্রোটোটাইপ।",
+
+        experience:
+          "ফুল-স্ট্যাক ডেভেলপমেন্ট এবং অ্যানিমেশনে অভিজ্ঞতার সাথে তিনি বিভিন্ন প্রজেক্টে কাজ করেছেন। তিনি ক্রমাগত নতুন প্রযুক্তি শিখেন এবং ওয়েব ডেভেলপমেন্টের সর্বশেষ ট্রেন্ডের সাথে আপডেট থাকেন।",
+
+        contact:
+          "আপনি মুন্নাকে munnakhandaker960@gmail.com এ ইমেইল করতে পারেন অথবা এই ওয়েবসাইটের কন্টাক্ট ফর্মের মাধ্যমে যোগাযোগ করতে পারেন। তিনি সর্বদা নতুন প্রজেক্ট নিয়ে আলোচনা করতে উন্মুক্ত!",
+
+        how_are_you: [
+          "আমি ভালো আছি, জিজ্ঞাসা করার জন্য ধন্যবাদ! আপনি কেমন আছেন?",
+          "চমৎকার! ভিজিটরদের সাথে কথা বলা সবসময় ভালো লাগে।",
+          "ফ্যান্টাস্টিক! মুন্নার পোর্টফোলিওতে আসার জন্য ধন্যবাদ।",
+        ],
+
+        thanks: [
+          "আপনাকে স্বাগতম! 😊",
+          "আমার আনন্দ!",
+          "সাহায্য করতে পেরে খুশি!",
+        ],
+
+        follow_up: [
+          "আগ্রহজনক! আপনি কী খুঁজছেন সে সম্পর্কে আরও বলবেন?",
+          "সাহায্য করতে চাই! মুন্নার কাজের কোন দিক আপনাকে আগ্রহী করে?",
+          "চমৎকার প্রশ্ন! তার দক্ষতা বা প্রজেক্ট সম্পর্কে বিশেষ কিছু জানতে চান?",
+        ],
+
+        default:
+          "আগ্রহজনক! মুন্নার কাজ, দক্ষতা বা অভিজ্ঞতা সম্পর্কে আরও বলতে আমি খুশি হব। আপনি কী জানতে চান?",
+      },
+    };
+
+    const langResponses =
+      responses[language as keyof typeof responses] || responses.en;
+
+    // Check for greetings first (most common interaction)
+    const greetingKeywords = [
+      "hello",
+      "hi",
+      "hey",
+      "greetings",
+      "good morning",
+      "good afternoon",
+      "good evening",
+      "নমস্কার",
+      "হ্যালো",
+      "স্বাগতম",
+      "আসসালামু আলাইকুম",
+      "kemon aso",
+      "kemon achen",
+      "assalamualaikum",
+    ];
+
+    if (greetingKeywords.some((word) => lowerMessage.includes(word))) {
+      return langResponses.greetings[
+        Math.floor(Math.random() * langResponses.greetings.length)
+      ];
+    }
+
+    // Check for casual conversation
+    const casualKeywords = {
+      how_are_you: [
+        "how are you",
+        "how do you do",
+        "how's it going",
+        "কেমন আছেন",
+        "কেমন আছো",
+        "ভালো আছেন",
+      ],
+      thanks: [
+        "thank you",
+        "thanks",
+        "thank you so much",
+        "ধন্যবাদ",
+        "থ্যাঙ্কস",
+        "থ্যাঙ্ক ইউ",
+      ],
+      bye: ["bye", "goodbye", "see you", "bye bye", "বিদায়", "আবার দেখা হবে"],
+    };
+
+    if (
+      casualKeywords.how_are_you.some((phrase) => lowerMessage.includes(phrase))
+    ) {
+      return langResponses.how_are_you[
+        Math.floor(Math.random() * langResponses.how_are_you.length)
+      ];
+    }
+
+    if (casualKeywords.thanks.some((phrase) => lowerMessage.includes(phrase))) {
+      return langResponses.thanks[
+        Math.floor(Math.random() * langResponses.thanks.length)
+      ];
+    }
+
+    if (casualKeywords.bye.some((phrase) => lowerMessage.includes(phrase))) {
+      return language === "bn"
+        ? "বিদায়! আবার দেখা হবে! 👋"
+        : "Goodbye! Hope to see you again! 👋";
+    }
+
+    // Check for professional questions about Munna
+    const professionalKeywords = {
+      about: ["about", "who is", "tell me about", "সম্পর্কে", "কে", "পরিচয়"],
+      skills: [
+        "skill",
+        "tech",
+        "technology",
+        "expertise",
+        "what can he do",
+        "দক্ষতা",
+        "টেক",
+      ],
+      work: [
+        "work",
+        "project",
+        "portfolio",
+        "what does he do",
+        "কাজ",
+        "প্রজেক্ট",
+      ],
+      experience: ["experience", "background", "career", "অভিজ্ঞতা", "পটভূমি"],
+      contact: ["contact", "email", "reach", "phone", "যোগাযোগ", "ইমেইল"],
+    };
+
+    if (
+      professionalKeywords.about.some((word) => lowerMessage.includes(word))
+    ) {
+      return langResponses.about;
+    }
+
+    if (
+      professionalKeywords.skills.some((word) => lowerMessage.includes(word))
+    ) {
+      return langResponses.skills;
+    }
+
+    if (professionalKeywords.work.some((word) => lowerMessage.includes(word))) {
+      return langResponses.work;
+    }
+
+    if (
+      professionalKeywords.experience.some((word) =>
+        lowerMessage.includes(word),
+      )
+    ) {
+      return langResponses.experience;
+    }
+
+    if (
+      professionalKeywords.contact.some((word) => lowerMessage.includes(word))
+    ) {
+      return langResponses.contact;
+    }
+
+    // If the message is unclear or doesn't match any category, ask for clarification
+    const unclearIndicators = [
+      "what",
+      "how",
+      "when",
+      "where",
+      "why",
+      "can you",
+      "do you",
+      "কি",
+      "কী",
+      "কোথায়",
+      "কখন",
+      "কেন",
+    ];
+
+    // Check if message contains question words or is very short
+    const hasQuestionWords = unclearIndicators.some((word) =>
+      lowerMessage.includes(word),
+    );
+    const isVeryShort = lowerMessage.length < 3;
+    const hasFewWords = lowerMessage.split(" ").length < 2;
+
+    if (hasQuestionWords || isVeryShort || hasFewWords) {
+      return langResponses.follow_up[
+        Math.floor(Math.random() * langResponses.follow_up.length)
+      ];
+    }
+
+    // Default response for other conversations - make it more engaging
+    const engagingResponses = [
+      "That's interesting! I'd love to hear more about what brings you here.",
+      "Great to chat with you! Is there anything specific about Munna's work you'd like to know?",
+      "I'm here to help! What aspect of web development or animation interests you most?",
+      "Thanks for reaching out! Munna would love to hear about your projects too.",
+      "That's awesome! Feel free to ask me anything about Munna's skills or experience.",
+    ];
+
+    return engagingResponses[
+      Math.floor(Math.random() * engagingResponses.length)
+    ];
+  };
+
+  const handleSendMessage = () => {
+    if (!inputText.trim()) return;
+
+    const messageText = inputText.trim();
+    const userMessage = {
+      id: Date.now().toString(),
+      text: messageText,
+      isUser: true,
+      language: detectLanguage(messageText),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInputText("");
+    setIsTyping(true);
+
+    // Simulate AI response delay
+    setTimeout(
+      () => {
+        const aiResponse = {
+          id: (Date.now() + 1).toString(),
+          text: generateResponse(messageText, userMessage.language),
+          isUser: false,
+          language: userMessage.language,
+        };
+        setMessages((prev) => [...prev, aiResponse]);
+        setIsTyping(false);
+      },
+      1000 + Math.random() * 1000,
+    );
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  return (
+    <motion.div
+      className="ai-chat-container"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <div className="ai-chat-messages">
+        {messages.map((message) => (
+          <motion.div
+            key={message.id}
+            className={`chat-message ${message.isUser ? "user" : "ai"}`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {!message.isUser && (
+              <div className="ai-avatar">
+                <img
+                  src={devPhoto}
+                  alt="MD. MUNNA KHANDAKAR"
+                  className="avatar-image"
+                />
+              </div>
+            )}
+            <div className="message-content">
+              <p>{message.text}</p>
+              {message.language && message.language !== "en" && (
+                <span className="language-indicator">
+                  {message.language.toUpperCase()}
+                </span>
+              )}
+              <button
+                className="message-delete"
+                onClick={() => deleteMessage(message.id)}
+                aria-label="Delete message"
+                title="Delete this message"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        ))}
+        {isTyping && (
+          <motion.div
+            className="chat-message ai typing"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="ai-avatar">
+              <img
+                src={devPhoto}
+                alt="MD. MUNNA KHANDAKAR"
+                className="avatar-image"
+              />
+            </div>
+            <div className="message-content">
+              <div className="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <div className="ai-chat-input">
+        <div className="input-container">
+          <textarea
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Type your message in any language... (English, Bengali, Hindi, Arabic, Chinese, etc.)"
+            rows={1}
+            className="chat-input"
+          />
+          <button
+            onClick={handleSendMessage}
+            disabled={!inputText.trim() || isTyping}
+            className="send-button"
+          >
+            Send
+          </button>
+        </div>
+        <div className="chat-actions">
+          <button
+            onClick={clearAllMessages}
+            className="clear-chat-button"
+            disabled={messages.length <= 1}
+          >
+            Clear Chat
+          </button>
+        </div>
+        <p className="chat-info">
+          💬 Supports multiple languages • 🤖 AI-powered responses • 📧
+          Portfolio inquiries welcome • 🗑️ Delete individual messages
+        </p>
+      </div>
+    </motion.div>
+  );
 }
 
 function Work({ defaultItems }: { defaultItems: GalleryItem[] }) {
@@ -1127,6 +1613,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/work" element={<WorkPage />} />
+          <Route path="/ai-chat" element={<AIChatPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="*" element={<HomePage />} />
         </Routes>
