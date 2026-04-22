@@ -591,11 +591,27 @@ function AIChat() {
   const [isTyping, setIsTyping] = useState(false);
   const [typingSoundEnabled, setTypingSoundEnabled] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lastSoundTime = useRef(0);
   const audioContextRef = useRef<AudioContext | null>(null);
 
+  // Auto-resize textarea without causing layout shifts
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    // Reset height to auto to get the correct scrollHeight
+    textarea.style.height = "auto";
+
+    // Calculate new height
+    const newHeight = Math.min(Math.max(textarea.scrollHeight, 44), 120);
+    textarea.style.height = `${newHeight}px`;
+  }, [inputText]);
+
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "instant" });
+    }
   };
 
   useEffect(() => {
@@ -1193,9 +1209,9 @@ function AIChat() {
           <motion.div
             key={message.id}
             className={`chat-message ${message.isUser ? "user" : "ai"}`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
           >
             {!message.isUser && (
               <div className="ai-avatar">
@@ -1229,6 +1245,8 @@ function AIChat() {
             className="chat-message ai typing"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
           >
             <div className="ai-avatar">
               <img
@@ -1252,6 +1270,7 @@ function AIChat() {
       <div className="ai-chat-input">
         <div className="input-container">
           <textarea
+            ref={textareaRef}
             value={inputText}
             onChange={(e) => {
               setInputText(e.target.value);
@@ -1261,6 +1280,7 @@ function AIChat() {
             placeholder="Type your message in any language... (English, Bengali, Hindi, Arabic, Chinese, etc.)"
             rows={1}
             className="chat-input"
+            style={{ height: "44px" }}
           />
           <button
             onClick={handleSendMessage}
@@ -1778,8 +1798,8 @@ function Footer() {
         </motion.div>
 
         <p>
-          © <span>{new Date().getFullYear()}</span> MD. ONTOR SHEIKH. Built
-          with React, Vite & Framer Motion.<br></br>
+          © <span>{new Date().getFullYear()}</span> MD. ONTOR SHEIKH. Built with
+          React, Vite & Framer Motion.<br></br>
           For getting more advanced super animated and functional websites,
           <br></br>
           contact MD. ONTOR SHEIKH (web developer)

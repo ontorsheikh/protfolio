@@ -2025,26 +2025,58 @@ a:focus-visible {
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100vh;
 }
 
 .ai-chat-messages {
-  max-height: 500px;
+  flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom scrollbar styling for messages */
+.ai-chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ai-chat-messages::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.ai-chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.4);
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.ai-chat-messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.6);
 }
 
 .chat-message {
   display: flex;
   gap: 0.75rem;
   max-width: 100%;
+  margin: 0;
+  flex-shrink: 0;
+  min-height: fit-content;
 }
 
 .chat-message.user {
   flex-direction: row-reverse;
+  justify-content: flex-start;
 }
 
 .chat-message.ai {
@@ -2068,6 +2100,9 @@ a:focus-visible {
   max-width: 70%;
   word-wrap: break-word;
   position: relative;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  min-height: fit-content;
 }
 
 .message-content p {
@@ -2136,6 +2171,8 @@ a:focus-visible {
   gap: 4px;
   align-items: center;
   padding: 0.5rem 0;
+  height: 24px;
+  min-height: 24px;
 }
 
 .typing-indicator span {
@@ -2171,13 +2208,17 @@ a:focus-visible {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1.5rem;
   background: rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .input-container {
   display: flex;
   gap: 0.75rem;
   align-items: flex-end;
-  margin-bottom: 0.75rem;
+  flex-shrink: 0;
 }
 
 .chat-actions {
@@ -2185,7 +2226,7 @@ a:focus-visible {
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 0.75rem;
+  flex-shrink: 0;
 }
 
 .clear-chat-button {
@@ -2255,9 +2296,31 @@ a:focus-visible {
   font-family: inherit;
   font-size: 0.95rem;
   resize: none;
+  height: 44px;
   min-height: 44px;
   max-height: 120px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
   transition: border-color 0.2s ease;
+  line-height: 1.4;
+}
+
+/* Custom scrollbar for textarea */
+.chat-input::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-input::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-input::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 3px;
+}
+
+.chat-input::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.5);
 }
 
 .chat-input:focus {
@@ -2298,6 +2361,8 @@ a:focus-visible {
   color: var(--muted);
   text-align: center;
   line-height: 1.4;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 /* Mobile optimizations for chat */
@@ -2308,8 +2373,8 @@ a:focus-visible {
   }
 
   .ai-chat-messages {
-    max-height: 400px;
     padding: 1rem;
+    scrollbar-gutter: stable;
   }
 
   .message-content {
@@ -2327,5 +2392,9 @@ a:focus-visible {
 
   .send-button {
     align-self: stretch;
+  }
+
+  .chat-input {
+    width: 100%;
   }
 }
