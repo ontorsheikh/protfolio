@@ -608,15 +608,7 @@ function AIChat() {
     textarea.style.height = `${newHeight}px`;
   }, [inputText]);
 
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "instant" });
-    }
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  // Auto-scroll disabled - keeps scroll position fixed
 
   const deleteMessage = (messageId: string) => {
     setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
@@ -798,36 +790,7 @@ function AIChat() {
     const lowerMessage = userMessage.toLowerCase().trim();
     const emotion = detectEmotion(lowerMessage);
 
-    // Emotion-based responses in natural Bangla
-    const responses = {
-      happy: [
-        "শুনে খুব ভালো লাগলো! আপনার খুশিতে আমিও খুশি। 😊",
-        "দারুণ! আপনার দিনটি এমন চমৎকার কাটুক এটাই চাই। ✨",
-        "অসাধারণ! এই আনন্দ বজায় থাকুক। আপনার জন্য অনেক শুভকামনা! 😃",
-      ],
-      sad: [
-        "মন খারাপ করবেন না, আমি আছি তো আপনার সাথে। কি হয়েছে বলবেন? 😢",
-        "আমি বুঝতে পারছি আপনার কষ্ট। অনেক সময় এমন হয়, কিন্তু সব ঠিক হয়ে যাবে। আমি আপনার পাশেই আছি। ❤️",
-        "একটু ধৈর্য ধরুন বন্ধু। চাইলে আমার সাথে মন খুলে কথা বলতে পারেন। আমি আপনার কথা শুনব। 🫂",
-      ],
-      angry: [
-        "আমি দুঃখিত যদি আমার কোনো কথায় আপনি বিরক্ত হন। শান্ত হোন প্লিজ। 🙏",
-        "আমি বুঝতে পারছি আপনি রেগে আছেন। আমি কি কোনোভাবে আপনাকে সাহায্য করতে পারি? 🕊️",
-        "আপনার রাগের কারণটি বললে আমি হয়তো সমাধান দিতে পারতাম। আমি সবসময় সম্মানের সাথে আপনার কথা শুনছি।",
-      ],
-      confused: [
-        "চিন্তা করবেন না, আমি সহজ করে বুঝিয়ে দিচ্ছি। আপনি কি জানতে চান তা একটু খুলে বলুন। 🤔",
-        "বিষয়টি হয়তো একটু জটিল, তবে আমি আপনার জন্য সহজ করে দিচ্ছি। যেমন ধরুন... (উদাহরণের মাধ্যমে বুঝিয়ে বলা)",
-        "আপনি ঠিক কোন জায়গাটা বুঝতে পারছেন না? আমাকে বলুন, আমি ধাপে ধাপে বুঝিয়ে দেব। 📖",
-      ],
-      normal: [
-        "ঠিক আছে বন্ধু, বলুন আর কি সাহায্য করতে পারি? 🙂",
-        "হুম, আমি আপনার কথা শুনছি। আর কিছু কি বলতে চান?",
-        "বেশ তো! আর মুন্নার কাজ সম্পর্কে আপনার কোনো জিজ্ঞাসা আছে কি? 😊",
-      ],
-    };
-
-    // Contextual professional responses (still in Bangla and emotion-aware)
+    // Emotion-based responses removed - using general knowledge system instead
     const professionalResponses = {
       en: {
         // Greetings - keep natural and human-like
@@ -1113,6 +1076,224 @@ function AIChat() {
       return applyEmotion(langResponses.contact, emotion);
     }
 
+    // Extended Bengali keyword categories for comprehensive responses
+    const extensionKeywords = {
+      webDevelopment: [
+        "ওয়েব",
+        "ডেভেলপমেন্ট",
+        "ডেভেলপার",
+        "ওয়েবসাইট",
+        "সাইট",
+        "ডিজাইন",
+        "ফ্রন্টএন্ড",
+        "ব্যাকএন্ড",
+        "react",
+        "typescript",
+        "javascript",
+        "কোড",
+        "প্রোগ্রামিং",
+        "বিল্ড",
+        "তৈরি",
+      ],
+      animation: [
+        "অ্যানিমেশন",
+        "মোশন",
+        "ইন্টার্যাকশন",
+        "মাইক্রো ইন্টার্যাকশন",
+        "framer motion",
+        "স্মুথ",
+        "ট্রানজিশন",
+        "ভিজ্যুয়াল ইফেক্ট",
+        "অ্যানিমেট",
+      ],
+      performance: [
+        "পারফরম্যান্স",
+        "গতি",
+        "দ্রুত",
+        "অপটিমাইজেশন",
+        "অপটিমাইজ",
+        "লোডিং",
+        "টাইম",
+        "seo",
+        "স্পীড",
+      ],
+      accessibility: [
+        "অ্যাক্সেসিবিলিটি",
+        "অ্যাক্সেসিবল",
+        "wcag",
+        "স্ক্রিন রিডার",
+        "প্রতিবন্ধী",
+        "এনএ",
+        "সবার জন্য",
+      ],
+      portfolio: [
+        "পোর্টফোলিও",
+        "প্রজেক্ট",
+        "কাজ",
+        "প্রকল্প",
+        "উদাহরণ",
+        "দেখাও",
+        "এক্সাম্পল",
+        "শো",
+      ],
+      learning: [
+        "শেখা",
+        "শিখছি",
+        "শিখছ",
+        "শেখার",
+        "নতুন",
+        "আপডেট",
+        "ট্রেন্ড",
+        "প্রযুক্তি",
+      ],
+      collaboration: [
+        "সহযোগিতা",
+        "টিম",
+        "একসাথে",
+        "কাজ করা",
+        "যোগাযোগ",
+        "কোলাবরেশন",
+      ],
+      hiring: [
+        "নিয়োগ",
+        "নিযুক্ত",
+        "কাজ",
+        "প্রজেক্ট",
+        "হায়ার",
+        "চাকরি",
+        "সহযোগিতা",
+        "পার্টনারশিপ",
+      ],
+    };
+
+    const extensionResponses = {
+      webDevelopment: [
+        "মুন্না একজন অসাধারণ ওয়েব ডেভেলপার যিনি React, TypeScript এবং আধুনিক JavaScript ব্যবহার করে দ্রুত এবং নিরাপদ ওয়েবসাইট তৈরি করেন। তিনি পারফরম্যান্স এবং ব্যবহারকারীর অভিজ্ঞতাকে সর্বোচ্চ অগ্রাধিকার দেন। 🚀",
+        "ওয়েব ডেভেলপমেন্টে মুন্নার দক্ষতা অসাধারণ। তিনি ফ্রন্টএন্ড থেকে শুরু করে ব্যাকএন্ড পর্যন্ত সব কিছু করতে পারেন। তার কাজ সবসময় বিশুদ্ধ কোড এবং চমৎকার ডিজাইনে ভরা থাকে। 💻",
+      ],
+      animation: [
+        "অ্যানিমেশন হল মুন্নার বিশেষত্ব! তিনি Framer Motion এবং CSS অ্যানিমেশন ব্যবহার করে অসাধারণ মোশন ডিজাইন তৈরি করেন। প্রতিটি অ্যানিমেশন সুন্দর, মসৃণ এবং ব্যবহারকারীর অভিজ্ঞতা উন্নত করে। ✨",
+        "মুন্না বিশ্বাস করে যে অ্যানিমেশন শুধু সুন্দর দেখায় না, এটি ইউজার ইন্টারফেসকে আরও কার্যকর করে তোলে। তার প্রতিটি প্রজেক্টে মাইক্রো-ইন্টার্যাকশন এবং স্মুথ ট্রানজিশন থাকে। 🎬",
+      ],
+      performance: [
+        "পারফরম্যান্স অপটিমাইজেশন মুন্নার একটি মূল দক্ষতা। তিনি নিশ্চিত করে যে প্রতিটি ওয়েবসাইট দ্রুত লোড হয় এবং মসৃণভাবে চলে, এমনকি স্লো নেটওয়ার্কেও। ⚡",
+        "মুন্না কোড স্প্লিটিং, ইমেজ অপটিমাইজেশন এবং lazy লোডিং এর মতো প্রযুক্তি ব্যবহার করে সাইটের গতি বাড়ায়। তার কাজ সবসময় Core Web Vitals এর মান বজায় রাখে। 🏃",
+      ],
+      accessibility: [
+        "অ্যাক্সেসিবিলিটি মুন্নার জন্য অত্যন্ত গুরুত্বপূর্ণ। তিনি নিশ্চিত করে যে প্রতিটি ওয়েবসাইট সবার জন্য ব্যবহার করা সহজ, বিশেষ করে যারা শারীরিক প্রতিবন্ধী তাদের জন্য। ♿",
+        "মুন্না WCAG গাইডলাইন অনুসরণ করে এবং screen readers এর সাথে সামঞ্জস্যপূর্ণ কোড লেখে। তার লক্ষ্য হল সবার জন্য ইন্টারনেট আরও অ্যাক্সেসিবল করা। 🌍",
+      ],
+      portfolio: [
+        "মুন্নার পোর্টফোলিওতে রয়েছে বিভিন্ন ধরনের প্রজেক্ট - ব্যক্তিগত ওয়েবসাইট থেকে শুরু করে জটিল ওয়েব অ্যাপ্লিকেশন পর্যন্ত। প্রতিটি প্রজেক্ট তার দক্ষতা এবং সৃজনশীলতার প্রমাণ। 📁",
+        "তার কাজ দেখলে বুঝা যায় কিভাবে ডিজাইন এবং কোডিং একসাথে কাজ করে একটি অসাধারণ ব্যবহারকারী অভিজ্ঞতা তৈরি করতে। 🎨",
+      ],
+      learning: [
+        "মুন্না সবসময় নতুন প্রযুক্তি শিখছে এবং নিজেকে উন্নত করছে। তিনি বিশ্বাস করে যে ওয়েব ডেভেলপমেন্ট একটি চলমান শেখার প্রক্রিয়া। 📚",
+        "প্রতিদিন মুন্না নতুন ট্রিকস, টিপস এবং বেস্ট প্র্যাকটিস শিখে যোগ করে তার দক্ষতায়। এটাই তার সফলতার চাবিকাঠি। 🔑",
+      ],
+      collaboration: [
+        "মুন্না একজন দুর্দান্ত টিম প্লেয়ার এবং সহযোগিতায় বিশ্বাসী। তিনি ডিজাইনার, পিএম এবং অন্যান্য ডেভেলপারদের সাথে নির্বিঘ্নে কাজ করতে পারে। 🤝",
+        "যোগাযোগ এবং স্পষ্টতা মুন্নার কাজের মূল ভিত্তি। যেকোনো প্রজেক্টে সফলতার জন্য সঠিক যোগাযোগ অপরিহার্য এবং মুন্না এতে দক্ষ। 💬",
+      ],
+      hiring: [
+        "মুন্নাকে নিয়োগ করুন কারণ তিনি শুধু কোড লেখে না, তিনি অভিজ্ঞতা তৈরি করে। তার কাজ সৌন্দর্য এবং কার্যকারিতার নিখুঁত মিশ্রণ। 💼",
+        "যদি আপনি একজন ডেভেলপার খুঁজছেন যিনি আপনার ভিশন বুঝে এবং তা বাস্তবায়ন করতে পারে, তাহলে মুন্ন আপনার সেরা পছন্দ! 🌟",
+      ],
+    };
+
+    // Check extension keywords
+    if (
+      extensionKeywords.webDevelopment.some((word) =>
+        lowerMessage.includes(word),
+      )
+    ) {
+      return applyEmotion(
+        extensionResponses.webDevelopment[
+          Math.floor(Math.random() * extensionResponses.webDevelopment.length)
+        ],
+        emotion,
+      );
+    }
+
+    if (
+      extensionKeywords.animation.some((word) => lowerMessage.includes(word))
+    ) {
+      return applyEmotion(
+        extensionResponses.animation[
+          Math.floor(Math.random() * extensionResponses.animation.length)
+        ],
+        emotion,
+      );
+    }
+
+    if (
+      extensionKeywords.performance.some((word) => lowerMessage.includes(word))
+    ) {
+      return applyEmotion(
+        extensionResponses.performance[
+          Math.floor(Math.random() * extensionResponses.performance.length)
+        ],
+        emotion,
+      );
+    }
+
+    if (
+      extensionKeywords.accessibility.some((word) =>
+        lowerMessage.includes(word),
+      )
+    ) {
+      return applyEmotion(
+        extensionResponses.accessibility[
+          Math.floor(Math.random() * extensionResponses.accessibility.length)
+        ],
+        emotion,
+      );
+    }
+
+    if (
+      extensionKeywords.portfolio.some((word) => lowerMessage.includes(word))
+    ) {
+      return applyEmotion(
+        extensionResponses.portfolio[
+          Math.floor(Math.random() * extensionResponses.portfolio.length)
+        ],
+        emotion,
+      );
+    }
+
+    if (
+      extensionKeywords.learning.some((word) => lowerMessage.includes(word))
+    ) {
+      return applyEmotion(
+        extensionResponses.learning[
+          Math.floor(Math.random() * extensionResponses.learning.length)
+        ],
+        emotion,
+      );
+    }
+
+    if (
+      extensionKeywords.collaboration.some((word) =>
+        lowerMessage.includes(word),
+      )
+    ) {
+      return applyEmotion(
+        extensionResponses.collaboration[
+          Math.floor(Math.random() * extensionResponses.collaboration.length)
+        ],
+        emotion,
+      );
+    }
+
+    if (extensionKeywords.hiring.some((word) => lowerMessage.includes(word))) {
+      return applyEmotion(
+        extensionResponses.hiring[
+          Math.floor(Math.random() * extensionResponses.hiring.length)
+        ],
+        emotion,
+      );
+    }
+
     // If the message is unclear or doesn't match any category, ask for clarification
     const unclearIndicators = [
       "what",
@@ -1137,6 +1318,61 @@ function AIChat() {
     const hasFewWords = lowerMessage.split(" ").length < 2;
 
     if (hasQuestionWords || isVeryShort || hasFewWords) {
+      // General purpose response system for any topic
+      const generalResponses = {
+        math: [
+          "গণিত একটি সুন্দর বিষয়! আপনি গণনা করতে পারেন বা আরও বিস্তারিত বলতে পারেন। 🧮",
+          "হ্যাঁ, গণিত মজাদার! আপনার প্রশ্নটি আরও স্পষ্ট করে বলুন যাতে আমি সাহায্য করতে পারি। ✏️",
+        ],
+        education: [
+          "শিক্ষা খুবই গুরুত্বপূর্ণ! আপনি কোন বিষয় নিয়ে শিখছেন? আমি সাহায্য করতে পারি। 📚",
+          "পড়াশোনা করা অসাধারণ! আপনার নির্দিষ্ট প্রশ্ন জানান, আমি উত্তর দেওয়ার চেষ্টা করব। 🎓",
+        ],
+        cooking: [
+          "রান্না করা একটি শিল্প! আপনি কি রান্না শিখতে চান? 👨‍🍳",
+          "খাবার তৈরি করা মজাদার! আপনি কোন রেসিপি চান? 🍳",
+        ],
+        technology: [
+          "প্রযুক্তি সম্পর্কে কথা বলছি? দারুণ! আর বিস্তারিত বলুন। 💻",
+          "আধুনিক প্রযুক্তি খুবই রোমাঞ্চকর! আপনি কি নির্দিষ্ট কিছু জানতে চান? ⚙️",
+        ],
+        sports: [
+          "খেলাধুলা দুর্দান্ত! আপনার পছন্দের খেলা কি? ⚽",
+          "ক্রীড়া সম্পর্কে আলোচনা করছেন? দুর্দান্ত! 🏆",
+        ],
+        health: [
+          "স্বাস্থ্য সবচেয়ে গুরুত্বপূর্ণ! আপনি সুস্থ থাকুন। 💪",
+          "সুস্বাস্থ্য জীবনের চাবিকাঠি। কোন স্বাস্থ্য সম্পর্কিত পরামর্শ চান? 🏥",
+        ],
+        entertainment: [
+          "বিনোদন সম্পর্কে কথা বলছেন? মজাদার! আপনার পছন্দ কি? 🎬",
+          "চলচ্চিত্র, সঙ্গীত বা গেমস? কি ধরনের বিনোদন পছন্দ করেন? 🎮",
+        ],
+      };
+
+      // Check for general topics
+      const topicKeywords = {
+        math: ["গণিত", "math", "হিসাব", "যোগ", "বিয়োগ", "গুণ", "ভাগ", "সংখ্যা"],
+        education: ["পড়াশোনা", "শিক্ষা", "পরীক্ষা", "স্কুল", "কলেজ", "বিশ্ববিদ্যালয়", "শেখা", "পড়ি", "study"],
+        cooking: ["রান্না", "খাবার", "রেসিপি", "রন্ধন", "요리", "cook", "food", "recipe"],
+        technology: ["প্রযুক্তি", "টেক", "প্রোগ্রাম", "কোড", "computer", "software", "app", "সফটওয়্যার"],
+        sports: ["খেলা", "ক্রীড়া", "ফুটবল", "ক্রিকেট", "ব্যাডমিন্টন", "sport", "game", "খেলব"],
+        health: ["স্বাস্থ্য", "সুস্থ", "ফিটনেস", "ব্যায়াম", "স্বাস্থ্যসেবা", "health", "exercise", "disease"],
+        entertainment: ["চলচ্চিত্র", "সিনেমা", "গান", "সঙ্গীত", "নাটক", "গেমস", "movie", "music", "song"],
+      };
+
+      // Find matching topic
+      for (const [topic, keywords] of Object.entries(topicKeywords)) {
+        if (keywords.some((kw) => lowerMessage.includes(kw))) {
+          return applyEmotion(
+            generalResponses[topic as keyof typeof generalResponses][
+              Math.floor(Math.random() * generalResponses[topic as keyof typeof generalResponses].length)
+            ],
+            emotion,
+          );
+        }
+      }
+
       return applyEmotion(
         langResponses.follow_up[
           Math.floor(Math.random() * langResponses.follow_up.length)
@@ -1145,18 +1381,71 @@ function AIChat() {
       );
     }
 
-    // Default response for other conversations - make it more engaging
-    const engagingResponses = [
-      "That's interesting! I'd love to hear more about what brings you here.",
-      "Great to chat with you! Is there anything specific about Munna's work you'd like to know?",
-      "I'm here to help! What aspect of web development or animation interests you most?",
-      "Thanks for reaching out! Munna would love to hear about your projects too.",
-      "That's awesome! Feel free to ask me anything about Munna's skills or experience.",
-    ];
+    // General purpose AI - handle any type of question/statement
+    const generalKnowledgeResponses: { [key: string]: string[] } = {
+      "morning": ["সকালে শুভেচ্ছা! আপনার দিনটি দুর্দান্ত কাটুক। ☀️", "সকাল বেলা সবাইকে স্বাগতম! নতুন দিন, নতুন সম্ভাবনা। 🌅"],
+      "night": ["রাতে শুভেচ্ছা! ভালো ঘুম হোক। 🌙", "রাত হয়েছে, ভালো ঘুম নিন। 😴"],
+      "weather": ["আবহাওয়া নিয়ে কথা বলছেন? বাইরে কেমন দেখছে? 🌤️", "আবহাওয়া নিয়ে চিন্তা? আশা করি ভালো থাকবে। 🌦️"],
+      "birthday": ["জন্মদিনের শুভেচ্ছা! অনেক খুশি থাকুন! 🎂", "জন্মদিন উদযাপন করছেন? বহুবছর জীবন কামনা করি! 🎉"],
+      "friend": ["বন্ধুরা জীবনের সবচেয়ে মূল্যবান সম্পদ! আপনার বন্ধুরা ভাগ্যবান। 👥", "বন্ধুত্ব সত্যিই সুন্দর! বন্ধুদের সাথে সময় কাটান। 💛"],
+      "family": ["পরিবার সবকিছুর চেয়ে গুরুত্বপূর্ণ! আপনার পরিবারের জন্য দোয়া। 👨‍👩‍👧‍👦", "পরিবার আমাদের শক্তি। তাদের যত্ন নিন। ❤️"],
+      "love": ["ভালোবাসা সুন্দর অনুভূতি! সবাইকে ভালোবাসুন। 💕", "ভালোবাসা জীবনের অর্থ। কার সাথে ভালো লাগে আপনার? 💖"],
+      "dream": ["স্বপ্ন দেখুন এবং সেগুলি পূরণ করুন! আপনার স্বপ্ন কি? 🌟", "স্বপ্ন ভবিষ্যতের পথ দেখায়। বড় স্বপ্ন দেখুন! 🚀"],
+      "success": ["সাফল্য কঠোর পরিশ্রমের ফল! আপনিও পারবেন। 💪", "সফলতা অর্জনের পথ দীর্ঘ কিন্তু সুন্দর। ধৈর্য রাখুন। 🏆"],
+      "failure": ["ব্যর্থতা শেখার সুযোগ! হার মানবেন না। 💙", "প্রতিটি ব্যর্থতা নতুন শুরু। আবার চেষ্টা করুন। 🔄"],
+    };
 
-    return responses[emotion][
-      Math.floor(Math.random() * responses[emotion].length)
-    ];
+    // Check for general knowledge keywords
+    for (const [keyword, responseList] of Object.entries(generalKnowledgeResponses)) {
+      if (lowerMessage.includes(keyword)) {
+        return applyEmotion(
+          responseList[Math.floor(Math.random() * responseList.length)],
+          emotion,
+        );
+      }
+    }
+
+    // Smart fallback for ANY question/statement
+    const smartResponses = {
+      unknown: [
+        "ইন্টারেস্টিং! আরও বলুন, আমি শুনতে চাই। 👂",
+        "সেটা নিয়ে কথা বলছেন? দুর্দান্ত! আপনার মতামত জানতে চাই। 🤔",
+        "হুমম, সেটা একটি ভালো প্রশ্ন। আমি চিন্তা করছি... 🧠",
+        "আপনার চিন্তাভাবনা আমার কাছে গুরুত্বপূর্ণ। আরও বিস্তারিত বলুন। 💬",
+        "সেটা সত্যিই মনোযোগের দাবিদার! আপনার বিষয়টি খুবই গুরুত্বপূর্ণ। ⭐",
+      ],
+    };
+
+    return applyEmotion(
+      smartResponses.unknown[Math.floor(Math.random() * smartResponses.unknown.length)],
+      emotion,
+    );
+  };
+
+  const typeMessage = (
+    messageId: string,
+    fullText: string,
+    typingSpeed: number = 30,
+  ) => {
+    let currentIndex = 0;
+
+    const typeNextCharacter = () => {
+      if (currentIndex <= fullText.length) {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === messageId
+              ? { ...msg, text: fullText.slice(0, currentIndex) }
+              : msg,
+          ),
+        );
+        currentIndex++;
+        setTimeout(typeNextCharacter, typingSpeed);
+      } else {
+        setIsTyping(false);
+      }
+    };
+
+    typeNextCharacter();
   };
 
   const handleSendMessage = () => {
@@ -1174,17 +1463,25 @@ function AIChat() {
     setInputText("");
     setIsTyping(true);
 
-    // Simulate AI response delay
+    // Simulate AI response delay before starting typewriter effect
     setTimeout(
       () => {
-        const aiResponse = {
-          id: (Date.now() + 1).toString(),
-          text: generateResponse(messageText),
-          isUser: false,
-          language: userMessage.language,
-        };
-        setMessages((prev) => [...prev, aiResponse]);
-        setIsTyping(false);
+        const aiResponseId = (Date.now() + 1).toString();
+        const aiResponseText = generateResponse(messageText);
+
+        // Add empty message first
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: aiResponseId,
+            text: "",
+            isUser: false,
+            language: userMessage.language,
+          },
+        ]);
+
+        // Start typewriter effect
+        typeMessage(aiResponseId, aiResponseText, 30);
       },
       1000 + Math.random() * 1000,
     );
